@@ -1,21 +1,30 @@
 #include <c_types.h>
-#include <osapi.h>
-#include <user_interface.h>
-#include <time.h>
 #include <mem.h>
+#include <osapi.h>
+#include <time.h>
+#include <user_interface.h>
 
-#include "user_config.h"
 #include "rboot-ota.h"
 #include "uart.h"
+#include "user_config.h"
+
+#ifndef WIFI_SSID
+#error "WIFI_SSID must be defined"
+#endif
+#ifndef WIFI_PWD
+#error "WIFI_PWD must be defined"
+#endif
 
 static os_timer_t network_timer;
 
-void ICACHE_FLASH_ATTR user_rf_pre_init() {
+void ICACHE_FLASH_ATTR user_rf_pre_init()
+{
 }
 
-void ICACHE_FLASH_ATTR network_wait_for_ip() {
-
+void ICACHE_FLASH_ATTR network_wait_for_ip()
+{
 	struct ip_info ipconfig;
+
 	os_timer_disarm(&network_timer);
 	wifi_get_ip_info(STATION_IF, &ipconfig);
 	if (wifi_station_get_connect_status() == STATION_GOT_IP && ipconfig.ip.addr != 0) {
@@ -32,14 +41,15 @@ void ICACHE_FLASH_ATTR network_wait_for_ip() {
 	}
 }
 
-void ICACHE_FLASH_ATTR wifi_config_station() {
+void ICACHE_FLASH_ATTR wifi_config_station()
+{
 
 	struct station_config stationConf;
 
 	wifi_set_opmode(0x1);
 	stationConf.bssid_set = 0;
-//	os_strcpy(&stationConf.ssid, WIFI_SSID, os_strlen(WIFI_SSID));
-//	os_strcpy(&stationConf.password, WIFI_PWD, os_strlen(WIFI_PWD));
+	os_strncpy(stationConf.ssid, WIFI_SSID, os_strlen(stationConf.ssid));
+	os_strncpy(stationConf.password, WIFI_PWD, os_strlen(stationConf.password));
 	wifi_station_set_config(&stationConf);
 	uart0_send("wifi connecting...\r\n");
 	wifi_station_connect();
@@ -48,44 +58,48 @@ void ICACHE_FLASH_ATTR wifi_config_station() {
 	os_timer_arm(&network_timer, 2000, 0);
 }
 
-void ICACHE_FLASH_ATTR ShowIP() {
+void ICACHE_FLASH_ATTR ShowIP()
+{
 	struct ip_info ipconfig;
 	char msg[50];
 	wifi_get_ip_info(STATION_IF, &ipconfig);
 	if (wifi_station_get_connect_status() == STATION_GOT_IP && ipconfig.ip.addr != 0) {
 		os_sprintf(msg, "ip: %d.%d.%d.%d, mask: %d.%d.%d.%d, gw: %d.%d.%d.%d\r\n",
-			IP2STR(&ipconfig.ip), IP2STR(&ipconfig.netmask), IP2STR(&ipconfig.gw));
+			   IP2STR(&ipconfig.ip), IP2STR(&ipconfig.netmask), IP2STR(&ipconfig.gw));
 	} else {
 		os_sprintf(msg, "network status: %d\r\n", wifi_station_get_connect_status());
 	}
 	uart0_send(msg);
 }
 
-void ICACHE_FLASH_ATTR ShowInfo() {
+void ICACHE_FLASH_ATTR ShowInfo()
+{
 	char msg[50];
 
-    os_sprintf(msg, "\r\nSDK: v%s\r\n", system_get_sdk_version());
-    uart0_send(msg);
+	os_sprintf(msg, "\r\nSDK: v%s\r\n", system_get_sdk_version());
+	uart0_send(msg);
 
-    os_sprintf(msg, "Free Heap: %d\r\n", system_get_free_heap_size());
-    uart0_send(msg);
+	os_sprintf(msg, "Free Heap: %d\r\n", system_get_free_heap_size());
+	uart0_send(msg);
 
-    os_sprintf(msg, "CPU Frequency: %d MHz\r\n", system_get_cpu_freq());
-    uart0_send(msg);
+	os_sprintf(msg, "CPU Frequency: %d MHz\r\n", system_get_cpu_freq());
+	uart0_send(msg);
 
-    os_sprintf(msg, "System Chip ID: 0x%x\r\n", system_get_chip_id());
-    uart0_send(msg);
+	os_sprintf(msg, "System Chip ID: 0x%x\r\n", system_get_chip_id());
+	uart0_send(msg);
 
-    os_sprintf(msg, "SPI Flash ID: 0x%x\r\n", spi_flash_get_id());
-    uart0_send(msg);
+	os_sprintf(msg, "SPI Flash ID: 0x%x\r\n", spi_flash_get_id());
+	uart0_send(msg);
 
-    os_sprintf(msg, "SPI Flash Size: %d\r\n", (1 << ((spi_flash_get_id() >> 16) & 0xff)));
-    uart0_send(msg);
+	os_sprintf(msg, "SPI Flash Size: %d\r\n", (1 << ((spi_flash_get_id() >> 16) & 0xff)));
+	uart0_send(msg);
 }
 
-void ICACHE_FLASH_ATTR Switch() {
+void ICACHE_FLASH_ATTR Switch()
+{
 	char msg[50];
 	uint8 before, after;
+
 	before = rboot_get_current_rom();
 	if (before == 0) after = 1; else after = 0;
 	os_sprintf(msg, "Swapping from rom %d to rom %d.\r\n", before, after);
@@ -95,8 +109,8 @@ void ICACHE_FLASH_ATTR Switch() {
 	system_restart();
 }
 
-static void ICACHE_FLASH_ATTR OtaUpdate_CallBack(bool result, uint8 rom_slot) {
-
+static void ICACHE_FLASH_ATTR OtaUpdate_CallBack(bool result, uint8 rom_slot)
+{
 	if(result == true) {
 		// success
 		if (rom_slot == FLASH_BY_ADDR) {
@@ -116,14 +130,12 @@ static void ICACHE_FLASH_ATTR OtaUpdate_CallBack(bool result, uint8 rom_slot) {
 }
 
 static void ICACHE_FLASH_ATTR OtaUpdate() {
-	
 	// start the upgrade process
 	if (rboot_ota_start((ota_callback)OtaUpdate_CallBack)) {
 		uart0_send("Updating...\r\n");
 	} else {
 		uart0_send("Updating failed!\r\n\r\n");
 	}
-	
 }
 
 void ICACHE_FLASH_ATTR ProcessCommand(char* str) {
@@ -153,8 +165,8 @@ void ICACHE_FLASH_ATTR ProcessCommand(char* str) {
 	}
 }
 
-void ICACHE_FLASH_ATTR user_init(void) {
-
+void ICACHE_FLASH_ATTR user_init(void)
+{
 	char msg[50];
 
 	uart_init(BIT_RATE_115200,BIT_RATE_115200);
@@ -163,5 +175,4 @@ void ICACHE_FLASH_ATTR user_init(void) {
 	uart0_send(msg);
 
 	uart0_send("type \"help\" and press <enter> for help...\r\n");
-
 }

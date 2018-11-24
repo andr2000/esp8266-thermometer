@@ -1,6 +1,6 @@
 # use wifi settings from environment or hard code them here
-WIFI_SSID ?= ""
-WIFI_PWD  ?= ""
+WIFI_SSID ?= "ssid"
+WIFI_PWD  ?= "pwd"
 
 ESPTOOL2     ?= ./esptool2
 
