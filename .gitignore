@@ -1,3 +1,7 @@
+build
+firmware
+esptool2
+
 # Prerequisites
 *.d
 
