@@ -16,6 +16,7 @@ LIBS    = c gcc main hal phy net80211 lwip wpa pp crypto
 CFLAGS  = -g -O2 -Wpointer-arith -Wundef -Werror -Wno-implicit -Wl,-EL
 CFLAGS += -fno-inline-functions -nostdlib -mlongcalls  -mtext-section-literals
 CFLAGS += -D__ets__ -DICACHE_FLASH
+CFLAGS += -Irboot
 LDFLAGS = -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static
 
 LIBS	:= $(addprefix -l,$(LIBS))
@@ -31,6 +32,7 @@ endif
 .PHONY: all clean
 
 C_FILES = $(wildcard *.c)
+C_FILES += $(wildcard rboot/*.c)
 O_FILES = $(patsubst %.c,$(BUILD_DIR)/%.o,$(C_FILES))
 
 all: $(BUILD_DIR) $(FIRMW_DIR) $(FIRMW_DIR)/rom0.bin $(FIRMW_DIR)/rom1.bin
@@ -49,6 +51,7 @@ $(FIRMW_DIR)/%.bin: $(BUILD_DIR)/%.elf
 
 $(BUILD_DIR):
 	@mkdir -p $@
+	@mkdir -p $@/rboot
 
 $(FIRMW_DIR):
 	@mkdir -p $@
