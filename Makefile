@@ -12,11 +12,11 @@ FIRMW_DIR = firmware
 
 CC ?= xtensa-lx106-elf-gcc
 
-LIBS    = c gcc main hal phy net80211 lwip wpa pp crypto
+LIBS    = c gcc main hal phy net80211 lwip wpa pp crypto driver
 CFLAGS  = -g -O2 -Wpointer-arith -Wundef -Werror -Wno-implicit -Wl,-EL
 CFLAGS += -fno-inline-functions -nostdlib -mlongcalls  -mtext-section-literals
 CFLAGS += -D__ets__ -DICACHE_FLASH
-CFLAGS += -Irboot
+CFLAGS += -I$(SDK_ROOT)/driver_lib/include -Irboot
 LDFLAGS = -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static
 
 LIBS	:= $(addprefix -l,$(LIBS))

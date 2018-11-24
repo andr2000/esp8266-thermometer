@@ -12,6 +12,7 @@
 #include <mem.h>
 #include <osapi.h>
 
+#include "debug.h"
 #include "rboot-ota.h"
 
 #ifdef __cplusplus
@@ -181,7 +182,7 @@ static void ICACHE_FLASH_ATTR upgrade_connect_cb(void *arg) {
 	// http request string
 	request = (uint8 *)os_malloc(512);
 	if (!request) {
-		uart0_send("No ram!\r\n");
+		ERROR("No ram!");
 		rboot_ota_deinit();
 		return;
 	}
@@ -198,7 +199,7 @@ static void ICACHE_FLASH_ATTR upgrade_connect_cb(void *arg) {
 
 // connection attempt timed out
 static void ICACHE_FLASH_ATTR connect_timeout_cb() {
-	uart0_send("Connect timeout.\r\n");
+	ERROR("Connect timeout.");
 	// not connected so don't call disconnect on the connection
 	// but call our own disconnect callback to do the cleanup
 	upgrade_disconcb(upgrade->conn);
@@ -233,9 +234,7 @@ static const char* ICACHE_FLASH_ATTR esp_errstr(sint8 err) {
 
 // call back for lost connection
 static void ICACHE_FLASH_ATTR upgrade_recon_cb(void *arg, sint8 errType) {
-	uart0_send("Connection error: ");
-	uart0_send(esp_errstr(errType));
-	uart0_send("\r\n");
+	ERROR("Connection error: %s", esp_errstr(errType));
 	// not connected so don't call disconnect on the connection
 	// but call our own disconnect callback to do the cleanup
 	upgrade_disconcb(upgrade->conn);
@@ -245,9 +244,7 @@ static void ICACHE_FLASH_ATTR upgrade_recon_cb(void *arg, sint8 errType) {
 static void ICACHE_FLASH_ATTR upgrade_resolved(const char *name, ip_addr_t *ip, void *arg) {
 
 	if (ip == 0) {
-		uart0_send("DNS lookup failed for: ");
-		uart0_send(OTA_HOST);
-		uart0_send("\r\n");
+		ERROR("DNS lookup failed for: %s", OTA_HOST);
 		// not connected so don't call disconnect on the connection
 		// but call our own disconnect callback to do the cleanup
 		upgrade_disconcb(upgrade->conn);
@@ -288,7 +285,7 @@ bool ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback) {
 	// create upgrade status structure
 	upgrade = (upgrade_status*)os_zalloc(sizeof(upgrade_status));
 	if (!upgrade) {
-		uart0_send("No ram!\r\n");
+		ERROR("No ram!");
 		return false;
 	}
 
@@ -312,13 +309,13 @@ bool ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback) {
 	// create connection
 	upgrade->conn = (struct espconn *)os_zalloc(sizeof(struct espconn));
 	if (!upgrade->conn) {
-		uart0_send("No ram!\r\n");
+		ERROR("No ram!");
 		os_free(upgrade);
 		return false;
 	}
 	upgrade->conn->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
 	if (!upgrade->conn->proto.tcp) {
-		uart0_send("No ram!\r\n");
+		ERROR("No ram!");
 		os_free(upgrade->conn);
 		os_free(upgrade);
 		return false;
@@ -335,7 +332,7 @@ bool ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback) {
 	} else if (result == ESPCONN_INPROGRESS) {
 		// lookup taking place, will call upgrade_resolved on completion
 	} else {
-		uart0_send("DNS error!\r\n");
+		ERROR("DNS error!");
 		os_free(upgrade->conn->proto.tcp);
 		os_free(upgrade->conn);
 		os_free(upgrade);
