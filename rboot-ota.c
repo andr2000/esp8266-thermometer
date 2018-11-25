@@ -38,7 +38,7 @@ static os_timer_t ota_timer;
 
 // clean up at the end of the update
 // will call the user call back to indicate completion
-void ICACHE_FLASH_ATTR rboot_ota_deinit() {
+void FW_ICACHE_FLASH_ATTR rboot_ota_deinit() {
 
 	bool result;
 	uint8 rom_slot;
@@ -78,7 +78,7 @@ void ICACHE_FLASH_ATTR rboot_ota_deinit() {
 }
 
 // called when connection receives data (hopefully the rom)
-static void ICACHE_FLASH_ATTR upgrade_recvcb(void *arg, char *pusrdata, unsigned short length) {
+static void FW_ICACHE_FLASH_ATTR upgrade_recvcb(void *arg, char *pusrdata, unsigned short length) {
 
 	char *ptrData, *ptrLen, *ptr;
 
@@ -141,7 +141,7 @@ static void ICACHE_FLASH_ATTR upgrade_recvcb(void *arg, char *pusrdata, unsigned
 
 // disconnect callback, clean up the connection
 // we also call this ourselves
-static void ICACHE_FLASH_ATTR upgrade_disconcb(void *arg) {
+static void FW_ICACHE_FLASH_ATTR upgrade_disconcb(void *arg) {
 	// use passed ptr, as upgrade struct may have gone by now
 	struct espconn *conn = (struct espconn*)arg;
 
@@ -168,7 +168,7 @@ static void ICACHE_FLASH_ATTR upgrade_disconcb(void *arg) {
 }
 
 // successfully connected to update server, send the request
-static void ICACHE_FLASH_ATTR upgrade_connect_cb(void *arg) {
+static void FW_ICACHE_FLASH_ATTR upgrade_connect_cb(void *arg) {
 
 	uint8 *request;
 
@@ -198,14 +198,14 @@ static void ICACHE_FLASH_ATTR upgrade_connect_cb(void *arg) {
 }
 
 // connection attempt timed out
-static void ICACHE_FLASH_ATTR connect_timeout_cb() {
+static void FW_ICACHE_FLASH_ATTR connect_timeout_cb() {
 	ERROR("Connect timeout.");
 	// not connected so don't call disconnect on the connection
 	// but call our own disconnect callback to do the cleanup
 	upgrade_disconcb(upgrade->conn);
 }
 
-static const char* ICACHE_FLASH_ATTR esp_errstr(sint8 err) {
+static const char* FW_ICACHE_FLASH_ATTR esp_errstr(sint8 err) {
 	switch(err) {
 		case ESPCONN_OK:
 			return "No error, everything OK.";
@@ -233,7 +233,7 @@ static const char* ICACHE_FLASH_ATTR esp_errstr(sint8 err) {
 }
 
 // call back for lost connection
-static void ICACHE_FLASH_ATTR upgrade_recon_cb(void *arg, sint8 errType) {
+static void FW_ICACHE_FLASH_ATTR upgrade_recon_cb(void *arg, sint8 errType) {
 	ERROR("Connection error: %s", esp_errstr(errType));
 	// not connected so don't call disconnect on the connection
 	// but call our own disconnect callback to do the cleanup
@@ -241,7 +241,7 @@ static void ICACHE_FLASH_ATTR upgrade_recon_cb(void *arg, sint8 errType) {
 }
 
 // call back for dns lookup
-static void ICACHE_FLASH_ATTR upgrade_resolved(const char *name, ip_addr_t *ip, void *arg) {
+static void FW_ICACHE_FLASH_ATTR upgrade_resolved(const char *name, ip_addr_t *ip, void *arg) {
 
 	if (ip == 0) {
 		ERROR("DNS lookup failed for: %s", OTA_HOST);
@@ -271,7 +271,7 @@ static void ICACHE_FLASH_ATTR upgrade_resolved(const char *name, ip_addr_t *ip, 
 }
 
 // start the ota process, with user supplied options
-bool ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback) {
+bool FW_ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback) {
 
 	uint8 slot;
 	rboot_config bootconf;

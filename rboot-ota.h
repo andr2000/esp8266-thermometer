@@ -41,7 +41,7 @@ Accept: */*\r\n\r\n"
 typedef void (*ota_callback)(bool result, uint8 rom_slot);
 
 // function to perform the ota update
-bool ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback);
+bool FW_ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback);
 
 #ifdef __cplusplus
 }
