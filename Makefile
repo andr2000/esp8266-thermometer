@@ -9,6 +9,7 @@ FW_USER_ARGS  = -quiet -bin -boot2
 
 BUILD_DIR = build
 FIRMW_DIR = firmware
+MAP_FILE  = output.map
 
 CC ?= xtensa-lx106-elf-gcc
 
@@ -18,6 +19,7 @@ CFLAGS += -fno-inline-functions -nostdlib -mlongcalls  -mtext-section-literals
 CFLAGS += -D__ets__ -DICACHE_FLASH
 CFLAGS += -I$(SDK_ROOT)/driver_lib/include -Irboot
 LDFLAGS = -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static
+LDFLAGS += -Wl,-Map,$(MAP_FILE)
 
 LIBS	:= $(addprefix -l,$(LIBS))
 
@@ -60,3 +62,4 @@ clean:
 	@echo "RM $(BUILD_DIR) $(FIRMW_DIR)"
 	@rm -rf $(BUILD_DIR)
 	@rm -rf $(FIRMW_DIR)
+	@rm -f $(MAP_FILE)
