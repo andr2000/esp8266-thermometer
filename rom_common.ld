@@ -1,10 +1,34 @@
 /* This linker script generated from xt-genldscripts.tpp for LSP . */
 /* Linker Script for ld -N */
+
+/*
+ * This is the section used for the firmware, e.g. all the static libraries
+ * coming from the SDK live in .irom0.text section as before.
+ */
+SECTIONS
+{
+  .fw_irom0.text : ALIGN(4)
+  {
+    _fw_irom0_text_start = ABSOLUTE(.);
+
+    *.o:(.literal.* .text.*)
+
+    *(.fw_irom0.literal .fw_irom.literal .fw_irom.text.literal .fw_irom0.text .fw_irom.text)
+    _fw_irom0_text_end = ABSOLUTE(.);
+  } >fw_irom0_0_seg :fw_irom0_0_phdr
+}
+
+/*
+ * irom0_0_seg holds all the library code which doesn't change from
+ * firmware releases. So, any "static" code should go into this section:
+ * SDK, libraries etc.
+ */
 MEMORY
 {
   dport0_0_seg :                        org = 0x3FF00000, len = 0x10
   dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000
   iram1_0_seg :                         org = 0x40100000, len = 0x8000
+  irom0_0_seg :                         org = 0x40282010, len = 0x3C000
 }
 
 PHDRS
@@ -14,6 +38,7 @@ PHDRS
   dram0_0_bss_phdr PT_LOAD;
   iram1_0_phdr PT_LOAD;
   irom0_0_phdr PT_LOAD;
+  fw_irom0_0_phdr PT_LOAD;
 }
 
 
