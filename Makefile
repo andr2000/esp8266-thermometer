@@ -17,7 +17,7 @@ LIBS    = c gcc main hal phy net80211 lwip wpa pp crypto driver
 CFLAGS  = -g -O2 -Wpointer-arith -Wundef -Werror -Wno-implicit -Wl,-EL
 CFLAGS += -fno-inline-functions -nostdlib -mlongcalls  -mtext-section-literals
 CFLAGS += -D__ets__ -DICACHE_FLASH -MMD
-CFLAGS += -I$(SDK_ROOT)/driver_lib/include -Irboot
+CFLAGS += -I$(SDK_BASE)/driver_lib/include -Irboot
 LDFLAGS = -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static
 LDFLAGS += -Wl,-Map,$(MAP_FILE)
 
