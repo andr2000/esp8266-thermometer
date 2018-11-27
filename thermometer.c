@@ -18,7 +18,7 @@
 
 static os_timer_t network_timer;
 
-void FW_ICACHE_FLASH_ATTR network_wait_for_ip()
+void ICACHE_FLASH_ATTR network_wait_for_ip()
 {
 	struct ip_info ipconfig;
 
@@ -38,7 +38,7 @@ void FW_ICACHE_FLASH_ATTR network_wait_for_ip()
 	}
 }
 
-void FW_ICACHE_FLASH_ATTR wifi_config_station()
+void ICACHE_FLASH_ATTR wifi_config_station()
 {
 
 	struct station_config stationConf;
@@ -55,7 +55,7 @@ void FW_ICACHE_FLASH_ATTR wifi_config_station()
 	os_timer_arm(&network_timer, 2000, 0);
 }
 
-void FW_ICACHE_FLASH_ATTR ShowIP()
+void ICACHE_FLASH_ATTR ShowIP()
 {
 	struct ip_info ipconfig;
 	char msg[50];
@@ -69,7 +69,7 @@ void FW_ICACHE_FLASH_ATTR ShowIP()
 	INFO(msg);
 }
 
-void FW_ICACHE_FLASH_ATTR ShowInfo()
+void ICACHE_FLASH_ATTR ShowInfo()
 {
 	char msg[50];
 
@@ -92,7 +92,7 @@ void FW_ICACHE_FLASH_ATTR ShowInfo()
 	INFO(msg);
 }
 
-void FW_ICACHE_FLASH_ATTR Switch()
+void ICACHE_FLASH_ATTR Switch()
 {
 	char msg[50];
 	uint8 before, after;
@@ -106,7 +106,7 @@ void FW_ICACHE_FLASH_ATTR Switch()
 	system_restart();
 }
 
-static void FW_ICACHE_FLASH_ATTR OtaUpdate_CallBack(bool result, uint8 rom_slot)
+static void ICACHE_FLASH_ATTR OtaUpdate_CallBack(bool result, uint8 rom_slot)
 {
 	if(result == true) {
 		// success
@@ -126,7 +126,7 @@ static void FW_ICACHE_FLASH_ATTR OtaUpdate_CallBack(bool result, uint8 rom_slot)
 	}
 }
 
-static void FW_ICACHE_FLASH_ATTR OtaUpdate() {
+static void ICACHE_FLASH_ATTR OtaUpdate() {
 	// start the upgrade process
 	if (rboot_ota_start((ota_callback)OtaUpdate_CallBack)) {
 		INFO("Updating...\r\n");
@@ -135,7 +135,7 @@ static void FW_ICACHE_FLASH_ATTR OtaUpdate() {
 	}
 }
 
-void FW_ICACHE_FLASH_ATTR ProcessCommand(char* str) {
+void ICACHE_FLASH_ATTR ProcessCommand(char* str) {
 	if (!strcmp(str, "help")) {
 		INFO("available commands\r\n");
 		INFO("  help - display this message\r\n");
@@ -162,7 +162,7 @@ void FW_ICACHE_FLASH_ATTR ProcessCommand(char* str) {
 	}
 }
 
-void FW_ICACHE_FLASH_ATTR user_init(void)
+void ICACHE_FLASH_ATTR user_init(void)
 {
 	char msg[50];
 
