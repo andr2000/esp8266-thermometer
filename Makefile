@@ -5,7 +5,7 @@ WIFI_PWD  ?= "pwd"
 ESPTOOL2     ?= ./esptool2
 
 FW_SECTS      = .text .data .rodata
-FW_USER_ARGS  = -quiet -bin -boot2
+FW_USER_ARGS  = -quiet -bin -boot2 -1024
 
 BUILD_DIR = build
 FIRMW_DIR = firmware
