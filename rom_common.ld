@@ -155,6 +155,11 @@ SECTIONS
     _irom0_text_start = ABSOLUTE(.);
 
     *libat.a:(.literal.* .text.*)
+    *libc.a:(.literal .text .literal.* .text.*)
+    *libm.a:(.literal .text .literal.* .text.*)
+    *libgcc.a:_umoddi3.o(.literal .text)
+    *libgcc.a:_udivdi3.o(.literal .text)
+    *libstdc++.a:(.literal .text .literal.* .text.*)
     *libcrypto.a:(.literal.* .text.*)
     *libespnow.a:(.literal.* .text.*)
     *libjson.a:(.literal.* .text.*)
@@ -169,8 +174,6 @@ SECTIONS
     *libwps.a:(.literal.* .text.*)
 
     *libmbedtls.a:(.literal.* .text.*)
-
-    *libm.a:(.literal .text .literal.* .text.*)
 
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text)
     _irom0_text_end = ABSOLUTE(.);
