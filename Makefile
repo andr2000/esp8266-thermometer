@@ -1,8 +1,12 @@
+PREFIX              ?= .
 # use wifi settings from environment or hard code them here
-WIFI_SSID ?= "ssid"
-WIFI_PWD  ?= "pwd"
+WIFI_SSID           ?= "ssid"
+WIFI_PWD            ?= "pwd"
 
-ESPTOOL2     ?= ./esptool2
+export ESPTOOL2     ?= $(PWD)/esptool2
+export SPI_SIZE     ?= 1M
+export SPI_MODE     ?= qio
+export SPI_SPEED    ?= 40
 
 FW_SECTS      = .text .data .rodata
 FW_USER_ARGS  = -quiet -bin -boot2 -1024
@@ -13,11 +17,11 @@ MAP_FILE  = output.map
 
 CC ?= xtensa-lx106-elf-gcc
 
-LIBS    = c gcc main hal phy net80211 lwip wpa pp crypto driver
+LIBS    = c gcc main hal phy net80211 lwip wpa pp crypto driver wpa2
 CFLAGS  = -g -O2 -Wpointer-arith -Wundef -Werror -Wno-implicit -Wl,-EL
 CFLAGS += -fno-inline-functions -nostdlib -mlongcalls  -mtext-section-literals
 CFLAGS += -D__ets__ -DICACHE_FLASH -MMD
-CFLAGS += -I$(SDK_BASE)/driver_lib/include -Irboot
+CFLAGS += -I$(SDK_BASE)/driver_lib/include -Irboot -Irboot/appcode
 LDFLAGS = -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static
 LDFLAGS += -Wl,-Map,$(MAP_FILE)
 
@@ -30,17 +34,20 @@ ifneq ($(WIFI_PWD), "")
 	CFLAGS += -DWIFI_PWD=\"$(WIFI_PWD)\"
 endif
 
-.SECONDARY:
-.PHONY: all clean
-
 HEADERS = $(shell find . -name '*.h')
-SOURCES = $(shell find . -name '*.c')
+SOURCES = $(shell find . -not -path "./rboot/*" -name '*.c')
+SOURCES += ./rboot/appcode/rboot-api.c
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 DEPS = $(OBJECTS:%.o=%.d)
+SUBDIRS = rboot
 
-all: $(BUILD_DIR) $(FIRMW_DIR) $(FIRMW_DIR)/rom0.bin $(FIRMW_DIR)/rom1.bin
+all: $(SUBDIRS) $(BUILD_DIR) $(FIRMW_DIR) $(FIRMW_DIR)/rom0.bin $(FIRMW_DIR)/rom1.bin
 
 -include $(DEPS)
+
+$(SUBDIRS):
+	@echo "Making $@"
+	$(MAKE) -C $@ $(MAKECMDGOALS)
 
 $(BUILD_DIR)/%.o: %.c $(HEADERS)
 	@echo "CC $<"
@@ -66,8 +73,11 @@ $(BUILD_DIR):
 $(FIRMW_DIR):
 	@mkdir -p $@
 
-clean:
+clean: $(SUBDIRS)
 	@echo "RM $(BUILD_DIR) $(FIRMW_DIR)"
 	@rm -rf $(BUILD_DIR)
 	@rm -rf $(FIRMW_DIR)
 	@rm -f $(MAP_FILE)
+
+.SECONDARY:
+.PHONY: all clean $(SUBDIRS)
