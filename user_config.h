@@ -10,4 +10,16 @@
 // code for writing arbitrary files to flash
 #define OTA_FILE "file.bin"
 
+/* These are for 1MiB flash. */
+#ifdef SPI_SIZE_1M
+#define SYSTEM_PARTITION_RF_CAL_ADDR		0xfb000
+#define SYSTEM_PARTITION_RF_CAL_SZ		0x1000
+#define SYSTEM_PARTITION_PHY_DATA_ADDR		0xfc000
+#define SYSTEM_PARTITION_PHY_DATA_SZ		0x1000
+#define SYSTEM_PARTITION_SYSTEM_PARAMETER_ADDR	0xfd000
+#define SYSTEM_PARTITION_SYSTEM_PARAMETER_SZ	0x3000
+#else
+#error Undefined SPI flash size!
+#endif
+
 #endif /* __USER_CONFIG_H */

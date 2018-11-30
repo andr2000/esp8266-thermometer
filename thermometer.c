@@ -117,6 +117,31 @@ void ICACHE_FLASH_ATTR ProcessCommand(char* str) {
 	}
 }
 
+void ICACHE_FLASH_ATTR user_pre_init(void)
+{
+	static const partition_item_t part_table[] = {
+		{
+			SYSTEM_PARTITION_RF_CAL,
+			SYSTEM_PARTITION_RF_CAL_ADDR,
+			SYSTEM_PARTITION_RF_CAL_SZ,
+		},
+		{
+			SYSTEM_PARTITION_PHY_DATA,
+			SYSTEM_PARTITION_PHY_DATA_ADDR,
+			SYSTEM_PARTITION_PHY_DATA_SZ,
+		},
+		{
+			SYSTEM_PARTITION_SYSTEM_PARAMETER,
+			SYSTEM_PARTITION_SYSTEM_PARAMETER_ADDR,
+			SYSTEM_PARTITION_SYSTEM_PARAMETER_SZ,
+		},
+	};
+
+	while (!system_partition_table_regist(part_table,
+		sizeof(part_table)/sizeof(part_table[0]), 4))
+		continue;
+}
+
 void ICACHE_FLASH_ATTR user_init(void)
 {
 	char msg[50];
