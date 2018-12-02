@@ -79,6 +79,9 @@ $(BUILD_DIR):
 $(FIRMW_DIR):
 	@mkdir -p $@
 
+tags:
+	ctags -R --c-kinds=+p --c++-kinds=+p . ${SYSROOT} ${SDK_BASE}
+
 clean: $(SUBDIRS)
 	@echo "RM $(BUILD_DIR) $(FIRMW_DIR)"
 	@rm -rf $(BUILD_DIR)
@@ -86,4 +89,4 @@ clean: $(SUBDIRS)
 	@rm -f $(MAP_FILE)
 
 .SECONDARY:
-.PHONY: all clean $(SUBDIRS)
+.PHONY: all tags clean $(SUBDIRS)
