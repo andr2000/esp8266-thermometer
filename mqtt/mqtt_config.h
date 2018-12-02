@@ -25,22 +25,4 @@ typedef enum {
 	TWO_WAY_ANTHENTICATION = 3,
 } TLS_LEVEL;
 
-/* MQTT configuration. */
-#define DEFAULT_SECURITY	NO_TLS
-
-#define MQTT_BUF_SIZE		1024
-/* seconds */
-#define MQTT_KEEPALIVE		120
-/* seconds */
-#define MQTT_RECONNECT_TIMEOUT	5
-/* disable SSL */
-//#define MQTT_SSL_ENABLE
-
-#define QUEUE_BUFFER_SIZE	2048
-
-/*MQTT version 3.1 compatible with Mosquitto v0.15*/
-#define PROTOCOL_NAMEv31
-/*MQTT version 3.11 compatible with https://eclipse.org/paho/clients/testing/*/
-//PROTOCOL_NAMEv311
-
 #endif // __MQTT_CONFIG_H__
