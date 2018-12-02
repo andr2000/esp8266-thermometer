@@ -2,6 +2,9 @@ PREFIX              ?= .
 # use wifi settings from environment or hard code them here
 WIFI_SSID           ?= "ssid"
 WIFI_PWD            ?= "pwd"
+# use MQTT settings from environment or hard code them here
+MQTT_USER           ?= "mqtt_user"
+MQTT_PWD            ?= "mqtt_pwd"
 
 export ESPTOOL2     ?= $(PWD)/esptool2
 export SPI_SIZE     ?= 1M
@@ -38,6 +41,12 @@ ifneq ($(WIFI_SSID), "")
 endif
 ifneq ($(WIFI_PWD), "")
 	CFLAGS += -DWIFI_PWD=\"$(WIFI_PWD)\"
+endif
+ifneq ($(MQTT_USER), "")
+	CFLAGS += -DMQTT_USER=\"$(MQTT_USER)\"
+endif
+ifneq ($(MQTT_PWD), "")
+	CFLAGS += -DMQTT_PWD=\"$(MQTT_PWD)\"
 endif
 
 HEADERS = $(shell find . -name '*.h')

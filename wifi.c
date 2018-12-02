@@ -15,7 +15,7 @@
 #error "WIFI_PWD must be defined"
 #endif
 
-static wifi_on_sta_ready_clb callback;
+static wifi_on_sta_event_clb callback;
 static os_timer_t reconnect_tmr;
 
 static void ICACHE_FLASH_ATTR wait_for_ip()
@@ -65,6 +65,8 @@ static void ICACHE_FLASH_ATTR handle_event_cb(System_Event_t *evt)
 		DBG(LOG_TAG "STA: disconnected from ssid %s, reason %d\n",
 		    evt->event_info.disconnected.ssid,
 		    evt->event_info.disconnected.reason);
+		if (callback)
+			callback(evt->event);
 		break;
 	case EVENT_STAMODE_AUTHMODE_CHANGE:
 		DBG(LOG_TAG "STA: auth mode change: %d -> %d\n",
@@ -80,7 +82,7 @@ static void ICACHE_FLASH_ATTR handle_event_cb(System_Event_t *evt)
 		    IP2STR(&evt->event_info.got_ip.mask),
 		    IP2STR(&evt->event_info.got_ip.gw));
 		if (callback)
-			callback();
+			callback(evt->event);
 		break;
 	case EVENT_STAMODE_DHCP_TIMEOUT:
 		ERROR(LOG_TAG "STA: DHCP timed-out");
@@ -107,7 +109,7 @@ static void ICACHE_FLASH_ATTR handle_event_cb(System_Event_t *evt)
 	}
 }
 
-void ICACHE_FLASH_ATTR wifi_station_init(wifi_on_sta_ready_clb clb)
+void ICACHE_FLASH_ATTR wifi_station_init(wifi_on_sta_event_clb clb)
 {
 	struct station_config sta_conf;
 

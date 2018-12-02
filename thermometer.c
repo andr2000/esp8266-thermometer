@@ -6,9 +6,12 @@
 #include <user_interface.h>
 
 #include "debug.h"
+#include "mqtt-impl.h"
 #include "rboot-ota.h"
 #include "user_config.h"
 #include "wifi.h"
+
+char client_id[32];
 
 void ICACHE_FLASH_ATTR ShowIP()
 {
@@ -125,18 +128,29 @@ void ICACHE_FLASH_ATTR user_pre_init(void)
 		continue;
 }
 
-static void wifi_on_sta_ready(void)
+static void wifi_on_sta_event(uint32_t wifi_event)
 {
-	DBG("WiFi station connected");
-	ShowIP();
+	if (wifi_event == EVENT_STAMODE_GOT_IP) {
+		DBG("WiFi station connected");
+		ShowIP();
+		mqtt_start();
+	} else if (wifi_event == EVENT_STAMODE_DISCONNECTED) {
+		DBG("WiFi station disconnected");
+		mqtt_stop();
+	}
 }
 
 void ICACHE_FLASH_ATTR user_init(void)
 {
 	uart_init(BIT_RATE_115200,BIT_RATE_115200);
-	INFO("rBoot Sample Project");
-	INFO("Currently running rom %d.", rboot_get_current_rom());
+
+	os_sprintf(client_id, "%s.%08x", MQTT_CLIENT_ID_BASE,
+		   system_get_chip_id());
+
+	INFO("I am %s, current ROM slot %d", client_id,
+	     rboot_get_current_rom());
 	INFO("type \"help\" and press <enter> for help...");
 
-	wifi_station_init(wifi_on_sta_ready);
+	wifi_station_init(wifi_on_sta_event);
+	mqtt_init(client_id);
 }
