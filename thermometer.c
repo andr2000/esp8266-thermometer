@@ -80,14 +80,11 @@ void ICACHE_FLASH_ATTR ProcessCommand(char* str) {
 		INFO("available commands");
 		INFO("  help - display this message");
 		INFO("  ip - show current ip address");
-		INFO("  connect - connect to wifi");
 		INFO("  restart - restart the esp8266");
 		INFO("  switch - switch to the other rom and reboot");
 		INFO("  ota - perform ota update, switch rom and reboot");
 		INFO("  info - show esp8266 info");
 		INFO("");
-	} else if (!strcmp(str, "connect")) {
-		wifi_station_init(NULL);
 	} else if (!strcmp(str, "restart")) {
 		INFO("Restarting...");
 		system_restart();
@@ -128,10 +125,18 @@ void ICACHE_FLASH_ATTR user_pre_init(void)
 		continue;
 }
 
+static void wifi_on_sta_ready(void)
+{
+	DBG("WiFi station connected");
+	ShowIP();
+}
+
 void ICACHE_FLASH_ATTR user_init(void)
 {
 	uart_init(BIT_RATE_115200,BIT_RATE_115200);
 	INFO("rBoot Sample Project");
 	INFO("Currently running rom %d.", rboot_get_current_rom());
 	INFO("type \"help\" and press <enter> for help...");
+
+	wifi_station_init(wifi_on_sta_ready);
 }
