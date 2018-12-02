@@ -147,7 +147,7 @@ void ICACHE_FLASH_ATTR user_init(void)
 	os_sprintf(client_id, "%s.%08x", MQTT_CLIENT_ID_BASE,
 		   system_get_chip_id());
 
-	INFO("I am %s, current ROM slot %d", client_id,
+	INFO("I am %s revision " VERSION ", current ROM slot %d", client_id,
 	     rboot_get_current_rom());
 	INFO("type \"help\" and press <enter> for help...");
 

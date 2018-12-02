@@ -1,3 +1,5 @@
+GIT_VERSION = $(shell git describe --long --dirty --always --tags)
+
 PREFIX              ?= .
 # use wifi settings from environment or hard code them here
 WIFI_SSID           ?= "ssid"
@@ -24,6 +26,7 @@ LIBS    = c gcc main hal phy net80211 lwip wpa pp crypto driver wpa2
 CFLAGS  = -g -O2 -Wpointer-arith -Wundef -Werror -Wno-implicit -Wl,-EL
 CFLAGS += -fno-inline-functions -nostdlib -mlongcalls  -mtext-section-literals
 CFLAGS += -D__ets__ -DICACHE_FLASH -MMD -DUSE_OPTIMIZE_PRINTF
+CFLAGS += -DVERSION=\"$(GIT_VERSION)\"
 CFLAGS += -DSPI_SIZE_$(SPI_SIZE)
 CFLAGS += -I$(SDK_BASE)/driver_lib/include -Irboot -Irboot/appcode
 
