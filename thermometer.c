@@ -87,7 +87,7 @@ void ICACHE_FLASH_ATTR ProcessCommand(char* str) {
 		INFO("  info - show esp8266 info");
 		INFO("");
 	} else if (!strcmp(str, "connect")) {
-		wifi_config_station();
+		wifi_station_init(NULL);
 	} else if (!strcmp(str, "restart")) {
 		INFO("Restarting...");
 		system_restart();

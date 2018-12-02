@@ -5,6 +5,9 @@
 #include "debug.h"
 #include "wifi.h"
 
+#undef LOG_TAG
+#define LOG_TAG	"WiFi: "
+
 #ifndef WIFI_SSID
 #error "WIFI_SSID must be defined"
 #endif
@@ -12,37 +15,119 @@
 #error "WIFI_PWD must be defined"
 #endif
 
-static os_timer_t network_timer;
+static wifi_on_sta_ready_clb callback;
+static os_timer_t reconnect_tmr;
 
-void ICACHE_FLASH_ATTR network_wait_for_ip()
+static void ICACHE_FLASH_ATTR wait_for_ip()
 {
-	struct ip_info ipconfig;
-
-	os_timer_disarm(&network_timer);
-	wifi_get_ip_info(STATION_IF, &ipconfig);
-	if (wifi_station_get_connect_status() == STATION_GOT_IP && ipconfig.ip.addr != 0) {
-		INFO("ip: %d.%d.%d.%d",IP2STR(&ipconfig.ip));
-	} else {
-		INFO("network retry, status: %d", wifi_station_get_connect_status());
-		if(wifi_station_get_connect_status() == 3) wifi_station_connect();
-		os_timer_setfn(&network_timer, (os_timer_func_t *)network_wait_for_ip, NULL);
-		os_timer_arm(&network_timer, 2000, 0);
+	ERROR(LOG_TAG "Still not connected...");
+	switch (wifi_station_get_connect_status()) {
+	case STATION_IDLE:
+		/* Fallthrough. */
+	case STATION_NO_AP_FOUND:
+		/* Fallthrough. */
+	case STATION_CONNECT_FAIL:
+		/* Restart connection */
+		wifi_station_init(callback);
+		break;
+	case STATION_WRONG_PASSWORD:
+		ERROR(LOG_TAG "STA: Wrong password while connecting to AP");
+		break;
+	case STATION_CONNECTING:
+		/* Fallthrough. */
+	case STATION_GOT_IP:
+		/* Fallthrough. */
+	default:
+		/* Hope we are all good at this point. */
+		break;
 	}
 }
 
-void ICACHE_FLASH_ATTR wifi_config_station()
+static void ICACHE_FLASH_ATTR setup_reconnect_tmr()
 {
+	os_timer_disarm(&reconnect_tmr);
+	/* Single shot, no private data. */
+	os_timer_setfn(&reconnect_tmr, (os_timer_func_t *)wait_for_ip, NULL);
+	os_timer_arm(&reconnect_tmr, WIFI_STA_RECONNECT_MS, false);
+}
 
-	struct station_config stationConf;
+static void ICACHE_FLASH_ATTR handle_event_cb(System_Event_t *evt)
+{
+	DBG(LOG_TAG "event %x\n", evt->event);
 
-	wifi_set_opmode(0x1);
-	stationConf.bssid_set = 0;
-	os_strncpy(stationConf.ssid, WIFI_SSID, os_strlen(stationConf.ssid));
-	os_strncpy(stationConf.password, WIFI_PWD, os_strlen(stationConf.password));
-	wifi_station_set_config(&stationConf);
-	INFO("wifi connecting...");
+	switch (evt->event) {
+	case EVENT_STAMODE_CONNECTED:
+		DBG(LOG_TAG "STA: connected to ssid %s, channel %d\n",
+		    evt->event_info.connected.ssid,
+		    evt->event_info.connected.channel);
+		break;
+	case EVENT_STAMODE_DISCONNECTED:
+		DBG(LOG_TAG "STA: disconnected from ssid %s, reason %d\n",
+		    evt->event_info.disconnected.ssid,
+		    evt->event_info.disconnected.reason);
+		break;
+	case EVENT_STAMODE_AUTHMODE_CHANGE:
+		DBG(LOG_TAG "STA: auth mode change: %d -> %d\n",
+		    evt->event_info.auth_change.old_mode,
+		    evt->event_info.auth_change.new_mode);
+		break;
+	case EVENT_STAMODE_GOT_IP:
+		/* First disarm the reconnect timer - we are all good. */
+		os_timer_disarm(&reconnect_tmr);
+
+		DBG(LOG_TAG "STA: got ip: " IPSTR ", mask: " IPSTR ", gw: " IPSTR,
+		    IP2STR(&evt->event_info.got_ip.ip),
+		    IP2STR(&evt->event_info.got_ip.mask),
+		    IP2STR(&evt->event_info.got_ip.gw));
+		if (callback)
+			callback();
+		break;
+	case EVENT_STAMODE_DHCP_TIMEOUT:
+		ERROR(LOG_TAG "STA: DHCP timed-out");
+		break;
+	case EVENT_SOFTAPMODE_STACONNECTED:
+		DBG(LOG_TAG "AP: station connected: " MACSTR ", AID = %d\n",
+		    MAC2STR(evt->event_info.sta_connected.mac),
+		    evt->event_info.sta_connected.aid);
+		break;
+	case EVENT_SOFTAPMODE_STADISCONNECTED:
+		DBG(LOG_TAG "AP: station disconnected: " MACSTR ", AID = %d\n",
+		    MAC2STR(evt->event_info.sta_disconnected.mac),
+		    evt->event_info.sta_disconnected.aid);
+		break;
+	case EVENT_SOFTAPMODE_PROBEREQRECVED:
+		break;
+	case EVENT_OPMODE_CHANGED:
+		break;
+	case EVENT_SOFTAPMODE_DISTRIBUTE_STA_IP:
+		break;
+	default:
+		ERROR("Unknown wifi event received: %02x", evt->event);
+		break;
+	}
+}
+
+void ICACHE_FLASH_ATTR wifi_station_init(wifi_on_sta_ready_clb clb)
+{
+	struct station_config sta_conf;
+
+	DBG(LOG_TAG "Setting up the station");
+	callback = clb;
+	/* Will support STA only. */
+	wifi_set_opmode(STATION_MODE);
+	wifi_station_set_auto_connect(0);
+	wifi_station_disconnect();
+	wifi_station_dhcpc_stop();
+	wifi_set_event_handler_cb(handle_event_cb);
+
+	os_memset(&sta_conf, 0, sizeof(sta_conf));
+	os_strncpy(sta_conf.ssid, WIFI_SSID, os_strlen(sta_conf.ssid));
+	os_strncpy(sta_conf.password, WIFI_PWD, os_strlen(sta_conf.password));
+	wifi_station_set_config(&sta_conf);
+
+	INFO(LOG_TAG "Connecting to \"%s\"...", sta_conf.ssid);
 	wifi_station_connect();
-	os_timer_disarm(&network_timer);
-	os_timer_setfn(&network_timer, (os_timer_func_t *)network_wait_for_ip, NULL);
-	os_timer_arm(&network_timer, 2000, 0);
+	wifi_station_dhcpc_start();
+
+	setup_reconnect_tmr();
 }

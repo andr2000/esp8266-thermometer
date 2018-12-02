@@ -27,4 +27,7 @@
 #error Undefined SPI flash size!
 #endif
 
+/* Time out in ms before we try to reconnect to AP. */
+#define WIFI_STA_RECONNECT_MS	2000
+
 #endif /* __USER_CONFIG_H */
