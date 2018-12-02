@@ -123,7 +123,8 @@ void ICACHE_FLASH_ATTR user_pre_init(void)
 	};
 
 	while (!system_partition_table_regist(part_table,
-		sizeof(part_table)/sizeof(part_table[0]), 4))
+					      ARRAY_SIZE(part_table),
+					      SPI_FLASH_SIZE_MAP))
 		continue;
 }
 

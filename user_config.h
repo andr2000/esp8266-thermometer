@@ -1,6 +1,10 @@
 #ifndef __USER_CONFIG_H
 #define __USER_CONFIG_H
 
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+#endif
+
 // ota server details
 #define OTA_HOST "192.168.1.10"
 #define OTA_PORT 80
@@ -18,6 +22,7 @@
 #define SYSTEM_PARTITION_PHY_DATA_SZ		0x1000
 #define SYSTEM_PARTITION_SYSTEM_PARAMETER_ADDR	0xfd000
 #define SYSTEM_PARTITION_SYSTEM_PARAMETER_SZ	0x3000
+#define SPI_FLASH_SIZE_MAP 			FLASH_SIZE_8M_MAP_512_512
 #else
 #error Undefined SPI flash size!
 #endif
