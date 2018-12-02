@@ -21,14 +21,10 @@ void ICACHE_FLASH_ATTR network_wait_for_ip()
 	os_timer_disarm(&network_timer);
 	wifi_get_ip_info(STATION_IF, &ipconfig);
 	if (wifi_station_get_connect_status() == STATION_GOT_IP && ipconfig.ip.addr != 0) {
-		char page_buffer[40];
-		os_sprintf(page_buffer,"ip: %d.%d.%d.%d\r\n",IP2STR(&ipconfig.ip));
-		INFO(page_buffer);
+		INFO("ip: %d.%d.%d.%d",IP2STR(&ipconfig.ip));
 	} else {
-		char page_buffer[40];
-		os_sprintf(page_buffer,"network retry, status: %d\r\n",wifi_station_get_connect_status());
+		INFO("network retry, status: %d", wifi_station_get_connect_status());
 		if(wifi_station_get_connect_status() == 3) wifi_station_connect();
-		INFO(page_buffer);
 		os_timer_setfn(&network_timer, (os_timer_func_t *)network_wait_for_ip, NULL);
 		os_timer_arm(&network_timer, 2000, 0);
 	}
@@ -44,7 +40,7 @@ void ICACHE_FLASH_ATTR wifi_config_station()
 	os_strncpy(stationConf.ssid, WIFI_SSID, os_strlen(stationConf.ssid));
 	os_strncpy(stationConf.password, WIFI_PWD, os_strlen(stationConf.password));
 	wifi_station_set_config(&stationConf);
-	INFO("wifi connecting...\r\n");
+	INFO("wifi connecting...");
 	wifi_station_connect();
 	os_timer_disarm(&network_timer);
 	os_timer_setfn(&network_timer, (os_timer_func_t *)network_wait_for_ip, NULL);
