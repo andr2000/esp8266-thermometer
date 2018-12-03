@@ -10,4 +10,6 @@
 #define DBG(fmt, ...) do {} while(0)
 #endif
 
+#define MQTT_INFO	INFO
+
 #endif /* __DEBUG_H */

@@ -55,7 +55,7 @@ void ICACHE_FLASH_ATTR mqtt_init(char *client_id)
 	MQTT_InitConnection(&mqtt_client, MQTT_HOST, MQTT_PORT, NO_TLS);
 	MQTT_InitClient(&mqtt_client, mqtt_client_id,
 			MQTT_USER, MQTT_PWD,
-			MQTT_KEEPALIVE, 1);
+			MQTT_KEEPALIVE, MQTT_CLEAN_SESSION);
 
 	/* Last Will and Testament (LWT). */
 	MQTT_InitLWT(&mqtt_client, "/lwt", "offline", 0, 0);

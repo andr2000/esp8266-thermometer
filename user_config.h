@@ -27,6 +27,7 @@
 
 /* MQTT configuration. */
 #define MQTT_BUF_SIZE		1024
+#define MQTT_CLEAN_SESSION	1
 /* seconds */
 #define MQTT_KEEPALIVE		120
 /* seconds */
@@ -34,6 +35,7 @@
 /* disable SSL */
 //#define MQTT_SSL_ENABLE
 
+#define DEFAULT_SECURITY  0
 #define QUEUE_BUFFER_SIZE	2048
 
 /*MQTT version 3.1 compatible with Mosquitto v0.15*/
