@@ -1,0 +1,4 @@
+config THERMOMETER_DS18B20
+	tristate "Thermometer thing with DS18b20"
+	select WIFI
+	select RBOOT_OTA

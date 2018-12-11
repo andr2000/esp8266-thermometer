@@ -3,7 +3,9 @@
 
 #include <c_types.h>
 
-#include "mqtt/mqtt.h"
+#define MQTT_INFO	INFO
+
+#include "mqtt.h"
 
 void ICACHE_FLASH_ATTR mqtt_init(char *client_id);
 void ICACHE_FLASH_ATTR mqtt_start(void);

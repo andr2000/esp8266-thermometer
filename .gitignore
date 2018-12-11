@@ -20,6 +20,13 @@ esptool2
 *.gch
 *.pch
 
+# Generated include files
+#
+include/config
+include/linux/version.h
+include/generated
+arch/*/include/generated
+
 # Libraries
 *.lib
 *.a

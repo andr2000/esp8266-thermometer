@@ -163,24 +163,21 @@ include $(srctree)/scripts/Kbuild.include
 
 # Make variables (CC, etc...)
 
-AS		= $(CROSS_COMPILE)as
-LD		= $(CROSS_COMPILE)ld
-CC		= $(CROSS_COMPILE)gcc
-CPP		= $(CC) -E
-AR		= $(CROSS_COMPILE)ar
-NM		= $(CROSS_COMPILE)nm
-STRIP		= $(CROSS_COMPILE)strip
-OBJCOPY		= $(CROSS_COMPILE)objcopy
-OBJDUMP		= $(CROSS_COMPILE)objdump
+AS		?= $(CROSS_COMPILE)as
+LD		= $(CC)
+CC		?= $(CROSS_COMPILE)gcc
+CPP		?= $(CC) -E
+AR		?= $(CROSS_COMPILE)ar
+NM		?= $(CROSS_COMPILE)nm
+STRIP		?= $(CROSS_COMPILE)strip
+OBJCOPY		?= $(CROSS_COMPILE)objcopy
+OBJDUMP		?= $(CROSS_COMPILE)objdump
 AWK		= awk
 INSTALLKERNEL  := installkernel
 PERL		= perl
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_KERNEL	=
-AFLAGS_KERNEL	=
-
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
 # Needed to be compatible with the O= option
@@ -190,7 +187,7 @@ LINUXINCLUDE    := -Iinclude \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
-KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+KBUILD_CFLAGS   := -Wall -Wundef -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
@@ -202,6 +199,13 @@ KBUILD_AFLAGS   := -D__ASSEMBLY__
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
 KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
 KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+
+AFLAGS_KERNEL		:=
+CFLAGS_KERNEL		:=
+LDFLAGS			:=
+LDFLAGS_thingapp	:= -Wl,-Map,thingapp.map
+
+EXTRA_LIBS_thingapp	:=
 
 export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
 export CPP AR NM STRIP OBJCOPY OBJDUMP
@@ -301,10 +305,9 @@ config: scripts_basic outputmakefile FORCE
 
 else
 
-
 ifeq ($(dot-config),1)
 # Read in config
--include include/config/auto.conf
+include include/config/auto.conf
 
 
 # Read in dependencies to all Kconfig* files, make sure to run
@@ -328,33 +331,36 @@ include/config/auto.conf: ;
 endif # $(dot-config)
 
 
+include $(srctree)/thing/config.include
+
 # The all: target is the default when no target is given on the
 # command line.
 # This allow a user to issue only 'make' to build a kernel including modules
 # Defaults to vmlinux, but the arch makefile usually adds further targets
-all: myapp
+all: thingapp
 
 
-objs-y		:= main
+objs-y		:= thing
 libs-y		:= lib
 
-myapp-dirs	:= $(objs-y) $(libs-y)
-myapp-objs	:= $(patsubst %,%/built-in.o, $(objs-y))
-myapp-libs	:= $(patsubst %,%/lib.a, $(libs-y))
-myapp-all	:= $(myapp-objs) $(myapp-libs)
+thingapp-dirs	:= $(objs-y) $(libs-y)
+thingapp-objs	:= $(patsubst %,%/built-in.o, $(objs-y))
+thingapp-libs	:= $(patsubst %,%/lib.a, $(libs-y))
+thingapp-libs	+= $(EXTRA_LIBS_thingapp)
+thingapp-all	:= $(thingapp-objs) $(thingapp-libs)
 
 # Do modpost on a prelinked vmlinux. The finally linked vmlinux has
 # relevant sections renamed as per the linker script.
-quiet_cmd_myapp = LD      $@
-      cmd_myapp = $(CC) $(LDFLAGS) -o $@                          \
-      -Wl,--start-group $(myapp-libs) $(myapp-objs) -Wl,--end-group
+quiet_cmd_thingapp = LD      $@
+      cmd_thingapp = $(CC) $(LDFLAGS_thingapp) -o $@                     \
+      -Wl,--start-group $(thingapp-libs) $(thingapp-objs) -Wl,--end-group
 
-myapp: $(myapp-all)
-	$(call if_changed,myapp)
+thingapp: $(thingapp-all)
+	$(call if_changed,thingapp)
 
-# The actual objects are generated when descending, 
+# The actual objects are generated when descending,
 # make sure no implicit rule kicks in
-$(sort $(myapp-all)): $(myapp-dirs) ;
+$(sort $(thingapp-all)): $(thingapp-dirs) ;
 
 # Handle descending into subdirectories listed in $(vmlinux-dirs)
 # Preset locale variables to speed up the build process. Limit locale
@@ -364,8 +370,8 @@ $(sort $(myapp-all)): $(myapp-dirs) ;
 
 #PHONY += $(vmlinux-dirs)
 #$(vmlinux-dirs): prepare scripts
-PHONY += $(myapp-dirs)
-$(myapp-dirs): scripts_basic
+PHONY += $(thingapp-dirs)
+$(thingapp-dirs): scripts_basic
 	$(Q)$(MAKE) $(build)=$@
 
 
@@ -378,7 +384,7 @@ $(myapp-dirs): scripts_basic
 
 # Directories & files removed with 'make clean'
 CLEAN_DIRS  +=
-CLEAN_FILES +=	myapp
+CLEAN_FILES +=	thingapp thingapp.map
 
 # Directories & files removed with 'make mrproper'
 MRPROPER_DIRS  += include/config include/generated
@@ -388,7 +394,7 @@ MRPROPER_FILES += .config .config.old tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS
 #
 clean: rm-dirs  := $(CLEAN_DIRS)
 clean: rm-files := $(CLEAN_FILES)
-clean-dirs      := $(addprefix _clean_, $(myapp-dirs))
+clean-dirs      := $(addprefix _clean_, $(thingapp-dirs))
 
 PHONY += $(clean-dirs) clean archclean
 $(clean-dirs):
@@ -457,7 +463,7 @@ help:
 	@echo  ''
 	@echo  'Other generic targets:'
 	@echo  '  all		  - Build all targets marked with [*]'
-	@echo  '* myapp	  	  - Build the application'
+	@echo  '* thingapp	  	  - Build the application'
 	@echo  '  dir/            - Build all files in dir and below'
 	@echo  '  dir/file.[oisS] - Build specified target only'
 	@echo  '  dir/file.lst    - Build specified mixed source/assembly target only'

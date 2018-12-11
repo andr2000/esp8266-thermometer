@@ -1,27 +1,13 @@
-config ENABLE_LOGGING
-	bool "Enable log functions"
-	default y
-	help
-	  Say Y if you want to enable logging.
-	  If you say N here, logging is not compiled.
+config WIFI
+	tristate
 
-config DEFAULT_LOGLEVEL
-        int "Default message log level (1-4)"
-        range 1 4
-        default "3"
-	depends on ENABLE_LOGGING
-        help
-          Default priority level for log functions.
-	  Depending on this variable, each of log functions
-	  output log messages to the console, or just return
-	  without doing anything.
+config WIFI_SSID
+	string "WiFi SSID"
+	depends on WIFI
 
-	  LOGLEVEL     err       warn        info        debug
-	     1          o          x           x           x
-	     2          o          o           x           x
-	     3          o          o           o           x
-	     4          o          o           o           o
+config WIFI_PWD
+	string "WiFi password"
+	depends on WIFI
 
-	  here, o: output log messages
-	        x: do nothing
-
+config RBOOT_OTA
+	tristate

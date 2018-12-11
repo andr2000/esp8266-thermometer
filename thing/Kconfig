@@ -1,0 +1,38 @@
+choice
+	prompt "Select SPI flash size"
+	default SPI_SIZE_1MIB
+
+config SPI_SIZE_1MIB
+	bool "1 MiB"
+
+config SPI_SIZE_4MIB
+	bool "4 MiB"
+
+endchoice
+
+config DEBUG
+	bool "Enable log functions"
+	default y
+	help
+	  Say Y if you want to enable logging.
+	  If you say N here, logging is not compiled.
+
+config LOGLEVEL
+        int "Default message log level (1-4)"
+        range 1 4
+        default "3"
+	depends on DEBUG
+        help
+          Default priority level for log functions.
+	  Depending on this variable, each of log functions
+	  output log messages to the console, or just return
+	  without doing anything.
+
+	  LOGLEVEL     err       warn        info        debug
+	     1          o          x           x           x
+	     2          o          o           x           x
+	     3          o          o           o           x
+	     4          o          o           o           o
+
+	  here, o: output log messages
+	        x: do nothing

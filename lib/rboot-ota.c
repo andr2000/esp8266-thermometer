@@ -12,8 +12,8 @@
 #include <mem.h>
 #include <osapi.h>
 
-#include "debug.h"
-#include "rboot-ota.h"
+#include <debug.h>
+#include <rboot-ota.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -230,6 +230,7 @@ static const char* ICACHE_FLASH_ATTR esp_errstr(sint8 err) {
 		case ESPCONN_ISCONN:
 			return "Already connected.";
 	}
+	return NULL;
 }
 
 // call back for lost connection

@@ -1,0 +1,24 @@
+CFLAGS_KERNEL	+= -I$(srctree)/thing
+
+CFLAGS_KERNEL	+= -I$(SDK_BASE)/driver_lib/include
+CFLAGS_KERNEL	+= -g -O2 -Wpointer-arith -Wundef -Werror -Wno-implicit -Wl,-EL
+CFLAGS_KERNEL	+= -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals
+CFLAGS_KERNEL	+= -D__ets__ -DICACHE_FLASH -MMD -DUSE_OPTIMIZE_PRINTF
+
+LDFLAGS		+= -nostdlib
+
+LIBS		:= main hal pp driver
+ifdef CONFIG_WIFI
+	LIBS	+= c gcc phy net80211 lwip wpa crypto wpa2
+endif
+
+EXTRA_LIBS_thingapp	+= $(addprefix -l,$(LIBS))
+
+LDFLAGS_thingapp	+= -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static
+LDFLAGS_thingapp	+= -L$(srctree)/thing/ld
+
+ifdef CONFIG_RBOOT_OTA
+	ifdef CONFIG_SPI_SIZE_1MIB
+		LDFLAGS_thingapp	+= -T rom0_1mib.ld
+	endif
+endif

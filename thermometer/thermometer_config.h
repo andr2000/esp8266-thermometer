@@ -1,5 +1,5 @@
-#ifndef __USER_CONFIG_H
-#define __USER_CONFIG_H
+#ifndef __THERMOMETER_CONFIG_H
+#define __THERMOMETER_CONFIG_H
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -64,4 +64,4 @@
 /* Time out in ms before we try to reconnect to AP. */
 #define WIFI_STA_RECONNECT_MS	2000
 
-#endif /* __USER_CONFIG_H */
+#endif /* __THERMOMETER_CONFIG_H */
