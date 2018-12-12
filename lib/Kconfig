@@ -11,3 +11,14 @@ config WIFI_PWD
 
 config RBOOT_OTA
 	tristate
+
+config MQTT
+	tristate
+
+config MQTT_USER
+	string "MQTT user ID"
+	depends on MQTT
+
+config MQTT_PWD
+	string "MQTT password"
+	depends on MQTT

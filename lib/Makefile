@@ -13,3 +13,5 @@ endif
 lib-$(CONFIG_RBOOT_OTA)		+= rboot-ota.o rboot/appcode/rboot-api.o
 
 lib-$(CONFIG_WIFI)		+= wifi.o
+
+obj-$(CONFIG_MQTT)		+= mqtt/
