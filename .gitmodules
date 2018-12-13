@@ -1,3 +1,7 @@
-[submodule "rboot"]
-	path = rboot
-	url = git@github.com:raburton/rboot.git
+[submodule "external/rboot"]
+	path = external/rboot
+	url = https://github.com/raburton/rboot.git
+
+[submodule "external/esptool2"]
+	path = external/esptool2
+	url = https://github.com/raburton/esptool2.git
