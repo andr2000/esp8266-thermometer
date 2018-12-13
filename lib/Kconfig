@@ -1,27 +1,48 @@
-config ENABLE_LOGGING
-	bool "Enable log functions"
-	default y
-	help
-	  Say Y if you want to enable logging.
-	  If you say N here, logging is not compiled.
+config WIFI
+	tristate
 
-config DEFAULT_LOGLEVEL
-        int "Default message log level (1-4)"
-        range 1 4
-        default "3"
-	depends on ENABLE_LOGGING
-        help
-          Default priority level for log functions.
-	  Depending on this variable, each of log functions
-	  output log messages to the console, or just return
-	  without doing anything.
+menu "WiFi settings"
+config WIFI_SSID
+	string "WiFi SSID"
+	depends on WIFI
 
-	  LOGLEVEL     err       warn        info        debug
-	     1          o          x           x           x
-	     2          o          o           x           x
-	     3          o          o           o           x
-	     4          o          o           o           o
+config WIFI_PWD
+	string "WiFi password"
+	depends on WIFI
+endmenu
 
-	  here, o: output log messages
-	        x: do nothing
+config RBOOT_OTA
+	tristate
 
+menu "RBoot OTA settings"
+config RBOOT_OTA_HOST
+	string "rboot OTA host"
+	depends on RBOOT_OTA
+
+config RBOOT_OTA_PORT
+	int "rboot OTA port"
+	default "80"
+	depends on RBOOT_OTA
+endmenu
+
+config MQTT
+	tristate
+
+menu "MQTT settings"
+config MQTT_USER
+	string "MQTT user ID"
+	depends on MQTT
+
+config MQTT_PWD
+	string "MQTT password"
+	depends on MQTT
+
+config MQTT_HOST
+	string "MQTT host"
+	depends on MQTT
+
+config MQTT_PORT
+	int "MQTT port"
+	default "1883"
+	depends on MQTT
+endmenu
