@@ -8,11 +8,11 @@
 #undef LOG_TAG
 #define LOG_TAG	"WiFi: "
 
-#ifndef WIFI_SSID
-#error "WIFI_SSID must be defined"
+#ifndef CONFIG_WIFI_SSID
+#error "CONFIG_WIFI_SSID must be defined"
 #endif
-#ifndef WIFI_PWD
-#error "WIFI_PWD must be defined"
+#ifndef CONFIG_WIFI_PWD
+#error "CONFIG_WIFI_PWD must be defined"
 #endif
 
 static wifi_on_sta_event_clb callback;
@@ -123,8 +123,10 @@ void ICACHE_FLASH_ATTR wifi_station_init(wifi_on_sta_event_clb clb)
 	wifi_set_event_handler_cb(handle_event_cb);
 
 	os_memset(&sta_conf, 0, sizeof(sta_conf));
-	os_strncpy(sta_conf.ssid, WIFI_SSID, os_strlen(sta_conf.ssid));
-	os_strncpy(sta_conf.password, WIFI_PWD, os_strlen(sta_conf.password));
+	os_strncpy((char *)sta_conf.ssid, CONFIG_WIFI_SSID,
+		   os_strlen((char *)sta_conf.ssid));
+	os_strncpy((char *)sta_conf.password, CONFIG_WIFI_PWD,
+		   os_strlen((char *)sta_conf.password));
 	wifi_station_set_config(&sta_conf);
 
 	INFO(LOG_TAG "Connecting to \"%s\"...", sta_conf.ssid);

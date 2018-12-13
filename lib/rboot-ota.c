@@ -187,7 +187,7 @@ static void ICACHE_FLASH_ATTR upgrade_connect_cb(void *arg) {
 		return;
 	}
 	os_sprintf((char*)request,
-		"GET /%s HTTP/1.0\r\nHost: " OTA_HOST "\r\n" HTTP_HEADER,
+		"GET /%s HTTP/1.0\r\nHost: " CONFIG_OTA_HOST "\r\n" HTTP_HEADER,
 		(upgrade->rom_slot == FLASH_BY_ADDR ? OTA_FILE : (upgrade->rom_slot == 0 ? OTA_ROM0 : OTA_ROM1)));
 
 	// send the http request, with timeout for reply
@@ -244,7 +244,7 @@ static void ICACHE_FLASH_ATTR upgrade_recon_cb(void *arg, sint8 errType) {
 static void ICACHE_FLASH_ATTR upgrade_resolved(const char *name, ip_addr_t *ip, void *arg) {
 
 	if (ip == 0) {
-		ERROR("DNS lookup failed for: %s", OTA_HOST);
+		ERROR("DNS lookup failed for: %s", CONFIG_OTA_HOST);
 		// not connected so don't call disconnect on the connection
 		// but call our own disconnect callback to do the cleanup
 		upgrade_disconcb(upgrade->conn);
@@ -255,7 +255,7 @@ static void ICACHE_FLASH_ATTR upgrade_resolved(const char *name, ip_addr_t *ip, 
 	upgrade->conn->type = ESPCONN_TCP;
 	upgrade->conn->state = ESPCONN_NONE;
 	upgrade->conn->proto.tcp->local_port = espconn_port();
-	upgrade->conn->proto.tcp->remote_port = OTA_PORT;
+	upgrade->conn->proto.tcp->remote_port = CONFIG_OTA_PORT;
 	*(ip_addr_t*)upgrade->conn->proto.tcp->remote_ip = *ip;
 	// set connection call backs
 	espconn_regist_connectcb(upgrade->conn, upgrade_connect_cb);
@@ -325,7 +325,7 @@ bool ICACHE_FLASH_ATTR rboot_ota_start(ota_callback callback) {
 	system_upgrade_flag_set(UPGRADE_FLAG_START);
 
 	// dns lookup
-	result = espconn_gethostbyname(upgrade->conn, OTA_HOST, &upgrade->ip, upgrade_resolved);
+	result = espconn_gethostbyname(upgrade->conn, CONFIG_OTA_HOST, &upgrade->ip, upgrade_resolved);
 	if (result == ESPCONN_OK) {
 		// hostname is already cached or is actually a dotted decimal ip address
 		upgrade_resolved(0, &upgrade->ip, upgrade->conn);

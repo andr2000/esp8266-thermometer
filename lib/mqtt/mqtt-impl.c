@@ -8,13 +8,6 @@
 #undef LOG_TAG
 #define LOG_TAG	"MQTT: "
 
-#ifndef MQTT_USER
-#error "MQTT_USER must be defined"
-#endif
-#ifndef MQTT_PWD
-#error "MQTT_PWD must be defined"
-#endif
-
 MQTT_Client mqtt_client;
 char *mqtt_client_id;
 
@@ -52,9 +45,9 @@ void ICACHE_FLASH_ATTR mqtt_init(char *client_id)
 {
 	mqtt_client_id = client_id;
 
-	MQTT_InitConnection(&mqtt_client, MQTT_HOST, MQTT_PORT, NO_TLS);
+	MQTT_InitConnection(&mqtt_client, CONFIG_MQTT_HOST, CONFIG_MQTT_PORT, NO_TLS);
 	MQTT_InitClient(&mqtt_client, mqtt_client_id,
-			MQTT_USER, MQTT_PWD,
+			CONFIG_MQTT_USER, CONFIG_MQTT_PWD,
 			MQTT_KEEPALIVE, MQTT_CLEAN_SESSION);
 
 	/* Last Will and Testament (LWT). */

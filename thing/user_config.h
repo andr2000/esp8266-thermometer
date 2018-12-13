@@ -1,17 +1,11 @@
 #ifndef __USER_CONFIG_H
 #define __USER_CONFIG_H
 
+#include <generated/autoconf.h>
+
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 #endif
-
-/********************************************************************************
- * Hosts and ports.
- *******************************************************************************/
-#define OTA_HOST	"192.168.1.10"
-#define OTA_PORT	80
-#define MQTT_HOST	"192.168.1.10"
-#define MQTT_PORT	1883
 
 /********************************************************************************
  * OTA file names and paths.
@@ -46,7 +40,7 @@
 /********************************************************************************
  * These are for 1MiB flash.
  *******************************************************************************/
-#ifdef SPI_SIZE_1M
+#ifdef CONFIG_SPI_SIZE_1MIB
 #define SYSTEM_PARTITION_RF_CAL_ADDR		0xfb000
 #define SYSTEM_PARTITION_RF_CAL_SZ		0x1000
 #define SYSTEM_PARTITION_PHY_DATA_ADDR		0xfc000
