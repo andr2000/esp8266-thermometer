@@ -19,6 +19,29 @@ LDFLAGS_thingapp	+= -L$(srctree)/thing/ld
 
 ifdef CONFIG_RBOOT_OTA
 	ifdef CONFIG_SPI_SIZE_1MIB
-		LDFLAGS_thingapp	+= -T rom0_1mib.ld
+		LDFLAGS_thingapp_rom0	= -T rom0_1mib.ld
+		LDFLAGS_thingapp_rom1	= -T rom1_1mib.ld
 	endif
+else
+	ifdef CONFIG_SPI_SIZE_1MIB
+		LDFLAGS_thingapp	= -T rom_1mib.ld
+	endif
+endif
+
+# FIXME: this doesn't work under ifdef CONFIG_RBOOT_OTA
+CLEAN_FILES += thingapp.rom0.elf thingapp.rom1.elf
+
+ifdef CONFIG_RBOOT_OTA
+quiet_cmd_thingapp = LD      $@
+      cmd_thingapp = $(CC) $(LDFLAGS_thingapp) \
+      $(LDFLAGS_thingapp_rom0) -o $@.rom0.elf \
+      -Wl,--start-group $(thingapp-libs) $(thingapp-objs) -Wl,--end-group
+
+      cmd_thingapp += && $(CC) $(LDFLAGS_thingapp) \
+      $(LDFLAGS_thingapp_rom1) -o $@.rom1.elf \
+      -Wl,--start-group $(thingapp-libs) $(thingapp-objs) -Wl,--end-group
+else
+quiet_cmd_thingapp = LD      $@
+      cmd_thingapp = $(CC) $(LDFLAGS_thingapp) -o $@                     \
+      -Wl,--start-group $(thingapp-libs) $(thingapp-objs) -Wl,--end-group
 endif

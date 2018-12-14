@@ -341,7 +341,11 @@ install: thingapp
 	$(Q)mkdir -p $(INSTALL_PATH)
 	$(Q)cp -f external/esptool2 $(INSTALL_PATH)
 	$(Q)cp -f external/rboot/firmware/rboot.bin $(INSTALL_PATH)
+ifdef CONFIG_RBOOT_OTA
+	$(Q)cp -f thingapp.rom*.elf $(INSTALL_PATH)
+else
 	$(Q)cp -f thingapp $(INSTALL_PATH)
+endif
 
 CLEAN_DIRS += $(INSTALL_PATH)
 
@@ -363,10 +367,6 @@ thingapp-all	:= $(thingapp-objs) $(thingapp-libs)
 
 # Do modpost on a prelinked vmlinux. The finally linked vmlinux has
 # relevant sections renamed as per the linker script.
-quiet_cmd_thingapp = LD      $@
-      cmd_thingapp = $(CC) $(LDFLAGS_thingapp) -o $@                     \
-      -Wl,--start-group $(thingapp-libs) $(thingapp-objs) -Wl,--end-group
-
 thingapp: $(thingapp-all)
 	$(call if_changed,thingapp)
 
