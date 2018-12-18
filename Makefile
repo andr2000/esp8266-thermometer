@@ -336,23 +336,19 @@ include $(srctree)/thing/config.include
 
 INSTALL_PATH ?= out
 
-install: thingapp
+install: thingapp.bin
 	$(info Installing into $(INSTALL_PATH))
 	$(Q)mkdir -p $(INSTALL_PATH)
 	$(Q)cp -f external/esptool2 $(INSTALL_PATH)
 	$(Q)cp -f external/rboot/firmware/rboot.bin $(INSTALL_PATH)
-ifdef CONFIG_RBOOT_OTA
-	$(Q)cp -f thingapp.rom*.elf $(INSTALL_PATH)
-else
-	$(Q)cp -f thingapp $(INSTALL_PATH)
-endif
+	$(Q)cp -f thingapp.bin* $(INSTALL_PATH)
 
 
 # The all: target is the default when no target is given on the
 # command line.
 # This allow a user to issue only 'make' to build a kernel including modules
 # Defaults to vmlinux, but the arch makefile usually adds further targets
-all: thingapp
+all: thingapp thingapp.bin
 
 
 objs-y		:= thing
@@ -363,6 +359,9 @@ thingapp-objs	:= $(patsubst %,%/built-in.o, $(objs-y))
 thingapp-libs	:= $(patsubst %,%/lib.a, $(libs-y))
 thingapp-libs	+= $(EXTRA_LIBS_thingapp)
 thingapp-all	:= $(thingapp-objs) $(thingapp-libs)
+
+%.bin: thingapp
+	$(call if_changed,thingapp_bin)
 
 # Do modpost on a prelinked vmlinux. The finally linked vmlinux has
 # relevant sections renamed as per the linker script.
