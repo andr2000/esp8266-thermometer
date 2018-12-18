@@ -334,6 +334,17 @@ endif # $(dot-config)
 
 include $(srctree)/thing/config.include
 
+INSTALL_PATH ?= out
+
+install: thingapp
+	$(info Installing into $(INSTALL_PATH))
+	$(Q)mkdir -p $(INSTALL_PATH)
+	$(Q)cp -f external/esptool2 $(INSTALL_PATH)
+	$(Q)cp -f external/rboot/firmware/rboot.bin $(INSTALL_PATH)
+	$(Q)cp -f thingapp $(INSTALL_PATH)
+
+CLEAN_DIRS += $(INSTALL_PATH)
+
 # The all: target is the default when no target is given on the
 # command line.
 # This allow a user to issue only 'make' to build a kernel including modules
