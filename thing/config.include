@@ -28,9 +28,6 @@ else
 	endif
 endif
 
-# FIXME: this doesn't work under ifdef CONFIG_RBOOT_OTA
-CLEAN_FILES += thingapp.rom0.elf thingapp.rom1.elf
-
 ifdef CONFIG_RBOOT_OTA
 quiet_cmd_thingapp = LD      $@
       cmd_thingapp = $(CC) $(LDFLAGS_thingapp) \

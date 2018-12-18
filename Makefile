@@ -347,7 +347,6 @@ else
 	$(Q)cp -f thingapp $(INSTALL_PATH)
 endif
 
-CLEAN_DIRS += $(INSTALL_PATH)
 
 # The all: target is the default when no target is given on the
 # command line.
@@ -395,8 +394,9 @@ $(thingapp-dirs): scripts_basic
 # make distclean Remove editor backup files, patch leftover files and the like
 
 # Directories & files removed with 'make clean'
-CLEAN_DIRS  +=
-CLEAN_FILES +=	thingapp thingapp.map
+CLEAN_DIRS  += $(INSTALL_PATH)
+CLEAN_FILES +=	thingapp*
+
 
 # Directories & files removed with 'make mrproper'
 MRPROPER_DIRS  += include/config include/generated
