@@ -22,10 +22,18 @@ FW_USER_ARGS  := -quiet -bin -boot2
 
 export ESPTOOL2=external/esptool2
 
-ifdef CONFIG_SPI_SIZE_1MIB
-FW_USER_ARGS  += -1024
-else
-$(warning Unsupported SPI size)
+include $(srctree)/thing/spi.include
+
+ifeq ($(SPI_SIZE), 256K)
+	FW_USER_ARGS  += -256
+else ifeq ($(SPI_SIZE), 512K)
+	FW_USER_ARGS  += -512
+else ifeq ($(SPI_SIZE), 1M)
+	FW_USER_ARGS  += -1024
+else ifeq ($(SPI_SIZE), 2M)
+	FW_USER_ARGS  += -2048
+else ifeq ($(SPI_SIZE), 4M)
+	FW_USER_ARGS  += -4096
 endif
 
 ifdef CONFIG_RBOOT_OTA

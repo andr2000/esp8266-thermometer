@@ -1,0 +1,26 @@
+ifdef CONFIG_SPI_SPEED_20MHZ
+	SPI_SPEED = 20
+else ifdef CONFIG_SPI_SPEED_26_7MHZ
+	SPI_SPEED = 26
+else ifdef CONFIG_SPI_SPEED_40MHZ
+	SPI_SPEED = 40
+else ifdef CONFIG_SPI_SPEED_80MHZ
+	SPI_SPEED = 80
+endif
+
+ifdef CONFIG_SPI_MODE_QIO
+	SPI_MODE = qio
+else ifdef CONFIG_SPI_MODE_DIO
+	SPI_MODE = dio
+else ifdef CONFIG_SPI_MODE_QOUT
+	SPI_MODE = qout
+else ifdef CONFIG_SPI_MODE_DOUT
+	SPI_MODE = dout
+endif
+
+ifdef CONFIG_SPI_SIZE_1MIB
+	SPI_SIZE = 1M
+else ifdef CONFIG_SPI_SIZE_4MIB
+	SPI_SIZE = 4M
+endif
+
