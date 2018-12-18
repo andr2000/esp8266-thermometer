@@ -354,7 +354,11 @@ all: thingapp thingapp.bin
 objs-y		:= thing
 libs-y		:= lib
 
-thingapp-dirs	:= $(objs-y) $(libs-y) external
+#ifdef CONFIG_THERMOMETER_DS18B20
+thingapp-flavor := thermometer
+#endif
+
+thingapp-dirs	:= $(objs-y) $(libs-y) $(thingapp-flavor) external
 thingapp-objs	:= $(patsubst %,%/built-in.o, $(objs-y))
 thingapp-libs	:= $(patsubst %,%/lib.a, $(libs-y))
 thingapp-libs	+= $(EXTRA_LIBS_thingapp)
