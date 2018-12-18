@@ -3,5 +3,5 @@
 	url = https://github.com/raburton/rboot.git
 
 [submodule "external/esptool2"]
-	path = external/esptool2
+	path = external/esptool2src
 	url = https://github.com/raburton/esptool2.git

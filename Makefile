@@ -344,7 +344,7 @@ all: thingapp
 objs-y		:= thing
 libs-y		:= lib
 
-thingapp-dirs	:= $(objs-y) $(libs-y)
+thingapp-dirs	:= $(objs-y) $(libs-y) external
 thingapp-objs	:= $(patsubst %,%/built-in.o, $(objs-y))
 thingapp-libs	:= $(patsubst %,%/lib.a, $(libs-y))
 thingapp-libs	+= $(EXTRA_LIBS_thingapp)
