@@ -1,8 +1,8 @@
 #include <c_types.h>
+#include <driver/uart.h>
 #include <mem.h>
 #include <osapi.h>
 #include <time.h>
-#include <driver/uart.h>
 #include <user_interface.h>
 
 #include "debug.h"

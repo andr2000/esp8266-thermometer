@@ -2,8 +2,9 @@
 #include <user_interface.h>
 
 #include "debug.h"
+#include "mqtt.h"
 #include "mqtt_config.h"
-#include "mqtt-impl.h"
+#include "mqtt_impl.h"
 
 #undef LOG_TAG
 #define LOG_TAG	"MQTT: "

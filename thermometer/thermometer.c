@@ -6,13 +6,14 @@
 #include <user_interface.h>
 
 #include "debug.h"
-#include "mqtt-impl.h"
-#include "rboot-ota.h"
+#include "mqtt_impl.h"
+//#include "rboot-ota.h"
 #include "user_config.h"
 #include "wifi.h"
 
 char client_id[32];
 
+#if 0
 void ICACHE_FLASH_ATTR ShowIP()
 {
 	struct ip_info ipconfig;
@@ -154,3 +155,4 @@ void ICACHE_FLASH_ATTR user_init(void)
 	wifi_station_init(wifi_on_sta_event);
 	mqtt_init(client_id);
 }
+#endif

@@ -1,4 +1,4 @@
-menu "SPI settings
+menu "SPI settings"
 choice
 	prompt "Flash size"
 	default SPI_SIZE_1MIB
